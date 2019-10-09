@@ -86,18 +86,27 @@ app.post('/login', (req, res, next) => {
   // query the data base for the username record, to get the hashed password and salt
   models.Users.get({ username: req.body.username })
     .then((record) => {
-      // call compare fn with user provided password, hashed password from db, and salt
-      const match = models.Users.compare(req.body.password, record.password, record.salt);
-      // if passwords match,
+      // TODO: handle case where username doesn't exist yet
+      console.log('record: ', record);
+      if (!record) {
+        res.redirect('/signup');
+      } else {
+        // call compare fn with user provided password, hashed password from db, and salt
+        const match = models.Users.compare(req.body.password, record.password, record.salt);
+        // if passwords match,
         if (match) {
-          console.log('passwords match');
           // display index page
+          res.redirect('/');
         } else {
-          // display login page with try again prompts
+          // display login page with try again message
           console.log('passwords DONT match');
+          res.render('login-err');
         }
+      }
     })
-
+    .catch((err) => {
+      throw err;
+    });
 });
 
 app.get('/signup', (req, res, next) => {

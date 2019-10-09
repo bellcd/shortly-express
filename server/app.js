@@ -82,9 +82,22 @@ app.get('/login', (req, res, next) => {
 });
 
 app.post('/login', (req, res, next) => {
-  res.render('login');
-  console.log('req: ', req);
-  user.compare();
+  // res.render('login');
+  // query the data base for the username record, to get the hashed password and salt
+  models.Users.get({ username: req.body.username })
+    .then((record) => {
+      // call compare fn with user provided password, hashed password from db, and salt
+      const match = models.Users.compare(req.body.password, record.password, record.salt);
+      // if passwords match,
+        if (match) {
+          console.log('passwords match');
+          // display index page
+        } else {
+          // display login page with try again prompts
+          console.log('passwords DONT match');
+        }
+    })
+
 });
 
 app.get('/signup', (req, res, next) => {
@@ -92,13 +105,19 @@ app.get('/signup', (req, res, next) => {
 });
 
 app.post('/signup', (req, res, next) => {
-console.log('username_log:', req.body.username,
-  'password_log:', req.body.password)
-
-  console.log('RESULT:', models.Users.create({
+  const user = models.Users.create({
     username: req.body.username,
     password: req.body.password
-  }))
+  });
+
+  user
+    .then(() => {
+      res.status(200).send(`${req.body.username} created`);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send();
+    });
 });
 
 

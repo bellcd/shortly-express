@@ -1,6 +1,7 @@
 const utils = require('../lib/hashUtils');
 const Model = require('./model');
 const Users = require('./user');
+const db = require('../db');
 
 /**
  * Sessions is a class with methods to interact with the sessions table, which
@@ -50,10 +51,23 @@ class Sessions extends Model {
    * @returns {Promise<Object>} A promise that is fulfilled with the results of
    * an insert query or rejected with the error that occured.
    */
+
+
   create() {
+    setTimeout(() => {
+      console.log('waiting for timeout');
+    }, 2000)
+
+    console.log('inside sessions.create');
     let data = utils.createRandom32String();
     let hash = utils.createHash(data);
     return super.create.call(this, { hash });
+  }
+
+  getLastHash() {
+    db.query('SELECT hash FROM sessions WHERE id = LAST_INSERT_ID()', (err, result) => {
+      console.log('RESULT*', result)
+    })
   }
 }
 

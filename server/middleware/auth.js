@@ -2,6 +2,10 @@ const models = require('../models');
 const Promise = require('bluebird');
 
 module.exports.createSession = (req, res, next) => {
+  if (req.skipAuth) {
+    next();
+  } else {
+    console.log('CREATE SESSION')
   // const randomNum = hashUtils.createRandom32String();
   // const hash = hashUtils.createHash(randomNum) // TODO: add salt??
 
@@ -16,7 +20,7 @@ module.exports.createSession = (req, res, next) => {
   models.Sessions.create()
     .then((result) => {
       // set that hash as a cookie in the response
-      console.log('result: ', result);
+      //models.Sessions.getLastHash()
       res.set({
         'Set-Cookie': `cookie=${result.hash}`
       });
@@ -25,6 +29,7 @@ module.exports.createSession = (req, res, next) => {
     .catch((err) => {
       res.status(400).send();
     })
+  }
 };
 
 /************************************************************/

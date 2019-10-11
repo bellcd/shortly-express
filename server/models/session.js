@@ -53,14 +53,12 @@ class Sessions extends Model {
    */
 
 
-  create() {
+  create(hash) {
     setTimeout(() => {
       console.log('waiting for timeout');
     }, 2000)
 
     console.log('inside sessions.create');
-    let data = utils.createRandom32String();
-    let hash = utils.createHash(data);
     return super.create.call(this, { hash });
   }
 

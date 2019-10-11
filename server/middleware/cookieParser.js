@@ -10,6 +10,10 @@ const parseCookies = (req, res, next) => {
     // if NOT undefined, SKIP auth middleware
     req.skipAuth = true;
     next();
+  } else if (req.headers.cookie === undefined) {
+    // NO
+      // go to next middleware (auth)
+      next();
   } else {
     console.log('req.headers: ', req.headers);
     const cookies = req.headers.cookie;
@@ -27,19 +31,15 @@ const parseCookies = (req, res, next) => {
         .catch((err) => {
           console.log('err: ', err); // TODO: handle err
         })
-      if (cookie is a valid hash) {
-        // YES, let em in
-      }  else (cookie is invalid, userId is NULL) {
-        // else cookie is valid, userId is NULL
-          // they see create user, screen don't run auth middleware
-      } else {
-        // else cookie is invalid
-          // run auth middleware (create cookie and set it)
-      }
-    } else {
-      // NO
-        // go to next middleware (auth)
-        next();
+      // if (cookie is a valid hash) {
+      //   // YES, let em in
+      // }  else (cookie is invalid, userId is NULL) {
+      //   // else cookie is valid, userId is NULL
+      //     // they see create user, screen don't run auth middleware
+      // } else {
+      //   // else cookie is invalid
+      //     // run auth middleware (create cookie and set it)
+      // }
     }
   }
 };

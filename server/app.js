@@ -117,6 +117,7 @@ app.get('/signup', (req, res, next) => {
 });
 
 app.post('/signup', (req, res, next) => {
+  console.log('req.sessionHash: ', req.sessionHash);
   const user = models.Users.create({
     username: req.body.username,
     password: req.body.password

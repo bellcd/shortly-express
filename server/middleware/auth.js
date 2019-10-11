@@ -1,5 +1,6 @@
 const models = require('../models');
 const Promise = require('bluebird');
+const utils = require('../lib/hashUtils')
 
 module.exports.createSession = (req, res, next) => {
   if (req.skipAuth) {
@@ -17,12 +18,15 @@ module.exports.createSession = (req, res, next) => {
   // ie, how do we keep them linked without foreign keys?
 
   // generate and store a unique hash in the sessions table of the db
-  models.Sessions.create()
+  let data = utils.createRandom32String();
+  let hash = utils.createHash(data);
+  models.Sessions.create(hash)
     .then((result) => {
+      req.sessessionHash = hash
       // set that hash as a cookie in the response
       //models.Sessions.getLastHash()
       res.set({
-        'Set-Cookie': `cookie=${result.hash}`
+        'Set-Cookie': `cookie=${hash}`
       });
       next();
     })

@@ -6,7 +6,6 @@ module.exports.createSession = (req, res, next) => {
   if (req.skipAuth) {
     next();
   } else {
-    console.log('CREATE SESSION')
   // const randomNum = hashUtils.createRandom32String();
   // const hash = hashUtils.createHash(randomNum) // TODO: add salt??
 
@@ -20,19 +19,9 @@ module.exports.createSession = (req, res, next) => {
   // generate and store a unique hash in the sessions table of the db
   let data = utils.createRandom32String();
   let hash = utils.createHash(data);
-  models.Sessions.create(hash)
-    .then((result) => {
-      req.sessessionHash = hash
-      // set that hash as a cookie in the response
-      //models.Sessions.getLastHash()
-      res.set({
-        'Set-Cookie': `cookie=${hash}`
-      });
-      next();
-    })
-    .catch((err) => {
-      res.status(400).send();
-    })
+  req.sessionHash = hash
+
+  next();
   }
 };
 

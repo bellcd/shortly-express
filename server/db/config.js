@@ -38,7 +38,8 @@ module.exports = (db) => {
         CREATE TABLE IF NOT EXISTS sessions (
           id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
           hash VARCHAR(64),
-          userId INT
+          userId INT,
+          CONSTRAINT fk_userId FOREIGN KEY (userId) REFERENCES users(id)
         )`);
     })
     .error(err => {

@@ -15,11 +15,9 @@ const parseCookies = (req, res, next) => {
       // go to next middleware (auth)
       next();
   } else {
-    console.log('req.headers: ', req.headers);
     const cookies = req.headers.cookie;
     const cookiesArr = cookies.split('=');
     const value = cookiesArr[1];
-    console.log('value: ', value);
     // else check to see if req has a cookie
     if (value) {
       // YES, check if cookie is valid (exists in sessions table) AND userId is an integer

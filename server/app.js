@@ -90,7 +90,6 @@ app.post('/login', (req, res, next) => {
   models.Users.get({ username: req.body.username })
     .then((record) => {
       // TODO: handle case where username doesn't exist yet
-      console.log('record: ', record);
       if (!record) {
         res.redirect('/signup');
       } else {
@@ -102,7 +101,6 @@ app.post('/login', (req, res, next) => {
           res.redirect('/');
         } else {
           // display login page with try again message
-          console.log('passwords DONT match');
           res.render('login-err');
         }
       }
@@ -117,7 +115,6 @@ app.get('/signup', (req, res, next) => {
 });
 
 app.post('/signup', (req, res, next) => {
-  console.log('req.sessionHash: ', req.sessionHash);
   const user = models.Users.create({
     username: req.body.username,
     password: req.body.password
@@ -125,6 +122,15 @@ app.post('/signup', (req, res, next) => {
 
   user
     .then(() => {
+      return models.Users.get({username: req.body.username})
+    })
+    .then((user) => {
+      return models.Sessions.create(req.sessionHash, user.id);
+    })
+    .then(() => {
+      res.set({
+        'Set-Cookie': `cookie=${req.sessionHash}`
+      });
       res.status(200).send(`${req.body.username} created`);
     })
     .catch((err) => {
@@ -132,7 +138,6 @@ app.post('/signup', (req, res, next) => {
       res.status(400).send();
     });
 });
-
 
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail

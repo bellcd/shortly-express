@@ -53,19 +53,8 @@ class Sessions extends Model {
    */
 
 
-  create(hash) {
-    setTimeout(() => {
-      console.log('waiting for timeout');
-    }, 2000)
-
-    console.log('inside sessions.create');
-    return super.create.call(this, { hash });
-  }
-
-  getLastHash() {
-    db.query('SELECT hash FROM sessions WHERE id = LAST_INSERT_ID()', (err, result) => {
-      console.log('RESULT*', result)
-    })
+  create(hash, userId) {
+    return super.create.call(this, { hash, userId });
   }
 }
 

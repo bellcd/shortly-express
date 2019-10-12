@@ -161,6 +161,10 @@ app.post('/signup', (req, res, next) => {
     });
 });
 
+app.get('/logout', (req, res, next) => {
+  res.clearCookie('cookie');
+  res.redirect('/login');
+})
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail
 // assume the route is a short code and try and handle it here.

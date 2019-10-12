@@ -12,7 +12,6 @@ const parseCookies = (req, res, next) => {
     // already a string on req.sessionHash, SKIP auth middleware
     next();
   } else if (req.headers.cookie === undefined) {
-    // NO
     // go to next middleware (auth)
     req.skipAuth = false;
     next();

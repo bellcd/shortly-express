@@ -20,13 +20,14 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser);
 app.use(Auth.createSession);
 
-app.get('/',
+app.get('/', Auth.verifySession,
 (req, res) => {
+  console.log('inside GET /');
+  console.log('req.originalUrl: ', req.originalUrl);
   res.render('index');
 });
 
-app.get('/create',
-(req, res) => {
+app.get('/create', (req, res) => {
   res.render('index');
 });
 
@@ -81,6 +82,9 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 app.get('/login', (req, res, next) => {
+    console.log('inside GET /login');
+    console.log('req.originalUrl: ', req.originalUrl);
+    // console.log('req: ', req);
   res.render('login');
 });
 
@@ -97,6 +101,11 @@ app.post('/login', (req, res, next) => {
         const match = models.Users.compare(req.body.password, record.password, record.salt);
         // if passwords match,
         if (match) {
+          // set new cookie of sessionHash
+          res.set({
+            'Set-Cookie': `cookie=${req.sessionHash}`
+          });
+
           // display index page
           res.redirect('/');
         } else {
@@ -131,7 +140,7 @@ app.post('/signup', (req, res, next) => {
       res.set({
         'Set-Cookie': `cookie=${req.sessionHash}`
       });
-      res.status(200).send(`${req.body.username} created`);
+      res.redirect('/');
     })
     .catch((err) => {
       console.log(err);

@@ -21,6 +21,7 @@ module.exports.createSession = (req, res, next) => {
   let hash = utils.createHash(data);
   req.sessionHash = hash
 
+  // req.session.hash = hash;// TODO: verify req.session, and how it's used
   next();
   }
 };
@@ -28,3 +29,14 @@ module.exports.createSession = (req, res, next) => {
 /************************************************************/
 // Add additional authentication middleware functions below
 /************************************************************/
+
+// decide if certain incoming requests are allowed to skip the login screen, and go directly to app functionality
+module.exports.verifySession = function(req, res, next) {
+  if (req.needSignUp) {
+    res.redirect('/signup');
+  } else if (req.needLogin) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+};

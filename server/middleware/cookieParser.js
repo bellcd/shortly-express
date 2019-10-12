@@ -1,43 +1,51 @@
 const models = require('../models');
 
 const parseCookies = (req, res, next) => {
-  // console.log('req.headers.cookies: ', req.headers.cookies);
-  // console.log('req: ', req);
+  req.needLogin = true;
+  req.needSignUp = false;
+  req.skipAuth = true;
 
   // cookes property on req object might have the sessions hash, if this is from a redirected request
   // look at req.sessionHash
-  if (req.sessionHash !== undefined) {
-    // if NOT undefined, SKIP auth middleware
-    req.skipAuth = true;
+  undefined || 'string'
+
+
+  if (typeof req.sessionHash === 'string') {
+    // already a string on req.sessionHash, SKIP auth middleware
     next();
   } else if (req.headers.cookie === undefined) {
     // NO
       // go to next middleware (auth)
+      req.skipAuth = false;
       next();
   } else {
     const cookies = req.headers.cookie;
     const cookiesArr = cookies.split('=');
     const value = cookiesArr[1];
-    // else check to see if req has a cookie
+
     if (value) {
-      // YES, check if cookie is valid (exists in sessions table) AND userId is an integer
       models.Sessions.get({ hash: value })
         .then((result) => {
-          console.log('result: ', result);
-          next();
+          if (result === undefined) {
+            // else cookie is invalid
+            // run auth middleware (create cookie and set it)
+            req.skipAuth = false;
+            next();
+          } else if (result.userId !== null) {
+            // check if cookie is valid (exists in sessions table) AND userId is an integer
+            // user can skip login screen
+            req.needLogin = false;
+            next();
+          } else {
+            // check if cookie is valid (exists in sessions table) AND userId is NULL
+            // redirect to to sign up page
+            req.needSignUp = true;
+            next();
+          }
         })
         .catch((err) => {
           console.log('err: ', err); // TODO: handle err
         })
-      // if (cookie is a valid hash) {
-      //   // YES, let em in
-      // }  else (cookie is invalid, userId is NULL) {
-      //   // else cookie is valid, userId is NULL
-      //     // they see create user, screen don't run auth middleware
-      // } else {
-      //   // else cookie is invalid
-      //     // run auth middleware (create cookie and set it)
-      // }
     }
   }
 };

@@ -99,6 +99,7 @@ app.post('/login', (req, res, next) => {
       } else {
         // call compare fn with user provided password, hashed password from db, and salt
         const match = models.Users.compare(req.body.password, record.password, record.salt);
+        console.log('match: ', match);
         // if passwords match,
         if (match) {
           // set new cookie of sessionHash
@@ -106,8 +107,20 @@ app.post('/login', (req, res, next) => {
             'Set-Cookie': `cookie=${req.sessionHash}`
           });
 
-          // display index page
-          res.redirect('/');
+          // store created sessionHash in db
+          // find the record in the session table where userId matches relevant user
+          models.Users.get({ username: req.body.username})
+            .then((user) => {
+              // update that record's hash field with sessionHash
+              return models.Sessions.update({ userId: user.id }, { hash: req.sessionHash });
+            })
+            .then(() => {
+              // display index page
+              res.redirect('/');
+            })
+            .catch((err) => {
+              throw err;
+            })
         } else {
           // display login page with try again message
           res.render('login-err');

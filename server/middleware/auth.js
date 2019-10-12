@@ -32,6 +32,9 @@ module.exports.createSession = (req, res, next) => {
 
 // decide if certain incoming requests are allowed to skip the login screen, and go directly to app functionality
 module.exports.verifySession = function(req, res, next) {
+console.log('req.needSignUp: ', req.needSignUp);
+console.log('req.needLogin: ', req.needLogin);
+
   if (req.needSignUp) {
     res.redirect('/signup');
   } else if (req.needLogin) {

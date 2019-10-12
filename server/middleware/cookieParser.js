@@ -7,17 +7,15 @@ const parseCookies = (req, res, next) => {
 
   // cookes property on req object might have the sessions hash, if this is from a redirected request
   // look at req.sessionHash
-  undefined || 'string'
-
 
   if (typeof req.sessionHash === 'string') {
     // already a string on req.sessionHash, SKIP auth middleware
     next();
   } else if (req.headers.cookie === undefined) {
     // NO
-      // go to next middleware (auth)
-      req.skipAuth = false;
-      next();
+    // go to next middleware (auth)
+    req.skipAuth = false;
+    next();
   } else {
     const cookies = req.headers.cookie;
     const cookiesArr = cookies.split('=');
@@ -38,14 +36,14 @@ const parseCookies = (req, res, next) => {
             next();
           } else {
             // check if cookie is valid (exists in sessions table) AND userId is NULL
-            // redirect to to sign up page
+            // redirect to sign up page
             req.needSignUp = true;
             next();
           }
         })
         .catch((err) => {
           console.log('err: ', err); // TODO: handle err
-        })
+        });
     }
   }
 };
